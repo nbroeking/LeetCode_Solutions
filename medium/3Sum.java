@@ -7,7 +7,7 @@ class Solution {
         // Step 0: Validate inputs
         
         // Step 1: inialize the result list and helper variables
-        List<List<Integer>> result = new ArrayList(); 
+        Set<FoundSet> result = new HashSet<>(); 
         int number1Index = 0;
         int number2Index = 1; 
         int number3Index = 2;
@@ -19,14 +19,11 @@ class Solution {
                     int num1 = nums[number1Index];
                     int num2 = nums[number2Index];
                     int num3 = nums[number3Index];
-
-                    System.out.printf("New Check\n");
-                    System.out.printf("i1: %d, i2: %d, i3: %d\n", number1Index, number2Index, number3Index);
-                    System.out.printf("n1: %d, n2: %d, n3: %d\n\n", num1, num2, num3);
+                    
                     //Check if we found a solution
                     if (num1 + num2 + num3 == 0) {
                         //We found a solution add it to the result;
-                        result.add(Arrays.asList(num1, num2, num3));
+                        result.add(new FoundSet(num1, num2, num3));
                     }
                     number1Index++;
                 }
@@ -39,6 +36,39 @@ class Solution {
         }
     
         //Step3: Return the result
-        return result;
+        return result.stream().map(fs -> fs.toList()).collect(Collectors.toList());
+    }
+
+    //Found set represents a distinct set of 3 numbers that match the 3 sum match 
+    public static class FoundSet {
+        List<Integer> numbers = null;
+
+        public FoundSet(int num1, int num2, int num3) {
+            numbers = Arrays.asList(num1, num2, num3);
+            Collections.sort(this.numbers);
+        }
+
+        public List<Integer> toList() {
+            return numbers;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+
+            if (!(obj instanceof FoundSet)){
+                return false;
+            }
+
+            FoundSet fs = (FoundSet) obj;
+            return this.numbers.equals(fs.numbers);
+        }
+
+        @Override
+        public int hashCode() {
+            return numbers.hashCode();
+        }
     }
 }
