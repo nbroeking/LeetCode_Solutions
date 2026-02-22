@@ -1,74 +1,50 @@
 class Solution {
     public List<List<Integer>> threeSum(int[] nums) {
-        //Brute force solution. Iterate through the list with two pointers and check the sum of all values
 
-        // If we enforce that number1Index < number2Index < number3Index we will avoid duplicates
+        // i, j, _, _, _, _, k
+        // -3, -2, -1, 0, 1, 2, 3 
+        //Step 0 - Check edge cases
+        if (nums.length < 3) {
+            throw new RuntimeException();
+        }
 
-        // Step 0: Validate inputs
-        
-        // Step 1: inialize the result list and helper variables
-        Set<FoundSet> result = new HashSet<>(); 
-        int number1Index = 0;
-        int number2Index = 1; 
-        int number3Index = 2;
+        //Step 1 
+        Set<List<Integer>> results = new HashSet<>(2); //Saves an allocation later if we assume that there is at least 1 answer. 
 
-        // Step 2: Iterate through the lists checking each combination. 
-        while(number3Index < nums.length) {
-            while( number2Index < number3Index) {
-                while (number1Index < number2Index) {
-                    int num1 = nums[number1Index];
-                    int num2 = nums[number2Index];
-                    int num3 = nums[number3Index];
-                    
-                    //Check if we found a solution
-                    if (num1 + num2 + num3 == 0) {
-                        //We found a solution add it to the result;
-                        result.add(new FoundSet(num1, num2, num3));
-                    }
-                    number1Index++;
+        //Step 2 - Sort the array so we can run two pointer
+        Arrays.sort(nums);
+
+        //Indexes 
+        int i = 0; 
+        int j = 1;
+        int k = nums.length-1; 
+
+        //Step 3 - Find the results
+        // Exit condition -1*nums[i] = nums[j] + nums[k]
+        //Check the outer 
+        while (i < nums.length -2) {
+            System.out.printf("i = %d, j = %d, k = %d\n", i, j, k);
+            int target = nums[i] * -1;
+            while (j < k) {
+                int sumJAndK = nums[j] + nums[k];
+                if (target == sumJAndK) {
+                    results.add(Arrays.asList(nums[i], nums[j], nums[k]));
                 }
-                number1Index = 0;
-                number2Index++;
+                //Short circut in case we know we won't find a solution. 
+                if (nums[j] > target) {
+                    break;
+                }
+                
+                if (sumJAndK < target) {
+                    j++;
+                } else {
+                    k--;
+                }
             }
-            number1Index = 0; 
-            number2Index = 1;
-            number3Index++;
+            i++;
+            j = i +1;
+            k = nums.length-1;
         }
-    
-        //Step3: Return the result
-        return result.stream().map(fs -> fs.toList()).collect(Collectors.toList());
-    }
-
-    //Found set represents a distinct set of 3 numbers that match the 3 sum match 
-    public static class FoundSet {
-        List<Integer> numbers = null;
-
-        public FoundSet(int num1, int num2, int num3) {
-            numbers = Arrays.asList(num1, num2, num3);
-            Collections.sort(this.numbers);
-        }
-
-        public List<Integer> toList() {
-            return numbers;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-
-            if (!(obj instanceof FoundSet)){
-                return false;
-            }
-
-            FoundSet fs = (FoundSet) obj;
-            return this.numbers.equals(fs.numbers);
-        }
-
-        @Override
-        public int hashCode() {
-            return numbers.hashCode();
-        }
+        return new ArrayList<>(results); 
     }
 }
